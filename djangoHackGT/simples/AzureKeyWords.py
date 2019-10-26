@@ -14,7 +14,7 @@ class AzureKeyWords:
         fullText = fullText.strip()
         self.sentences = re.split("\.|\?|\!", fullText)
 
-    def splitAndSend(self, apiUrl, apiKey=os.environ['AZURE_API_KEY']):
+    def splitAndSend(self, apiUrl, apiKey):
         """ Split text into <5000 character sections keeping sentences and send to Azure"""
         allPackets = []
         packet = ""
@@ -51,4 +51,3 @@ if __name__ == "__main__":
     print(r.status_code)
     print(r.json()['documents'][0]['keyPhrases'])
     pp = pprint.PrettyPrinter(indent=4)
-
