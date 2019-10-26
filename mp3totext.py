@@ -97,12 +97,12 @@ def sample_long_running_recognize(audio_file_name):
     print(u"Waiting for operation to complete...")
     response = operation.result()
 
-    file = open(wav_file_name + "_transcript.txt", "w")
+    file = open(wav_file_name + "_transcript.txt", "w", encoding='utf-8')
 
     for result in response.results:
         # First alternative is the most probable result
         alternative = result.alternatives[0]
-        file.write(u"{}".format(alternative.transcript))
+        file.write("{}".format(alternative.transcript))
     file.close()
 
     delete_blob("102619hackgtaudio", wav_file_name)
@@ -113,7 +113,7 @@ def sample_long_running_recognize(audio_file_name):
 if __name__ == "__main__":
     # for audio_file_name in os.listdir(filepath):
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:/Users/vivek/Dropbox (GaTech)/Projects/HackGT/HackGT-77a8a0d36669.json"
-    audio_file_name = r"C:\Users\vivek\Dropbox (GaTech)\Projects\HackGT\Interpreting_line_plots.mp3"
+    audio_file_name = r"C:\Users\vivek\Dropbox (GaTech)\Projects\HackGT\pythagorean_khan_lecture.mp3"
     sample_long_running_recognize(audio_file_name)
 
 #mp3_to_wav("Interpreting_line_plots.mp3")
