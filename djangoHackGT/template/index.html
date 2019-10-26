@@ -1,0 +1,22 @@
+
+{% extends 'base.html' %}
+
+{% block title %} Upload {% endblock %}
+
+{% block body %}
+
+<h2> Upload </h2>
+<form method='post' enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type='file' name='document'>
+  <button type="submit">Upload file</button>
+
+{% endblock %}
+
+
+<script type='text/javascript'>
+{% block jquery %}
+
+
+{% endblock %}
+</script>

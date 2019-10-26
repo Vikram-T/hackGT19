@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block head_title %} Results {% endblock %}
+
+{% block body %}
+
+<h2> Test </h2>
+
+
+{% endblock %}
+
+
+<script type='text/javascript'>
+{% block jquery %}
+var recieved_data = {{ data|safe }}
+var text = recieved_data.text
+var keyword = recieved_data.keywords
+var complex = recieved_data.complex
+console.log(text)
+console.log(keyword)
+console.log(complex)
+
+var html = '<div id="content" align="center" style="display:inline">'
+for (var i = 0; i < text.length; i++) {
+  console.log(i)
+  if(keyword.includes(text[i])){
+    console.log(text[i])
+    html = html + '<p style="color:red;display:inline">'+ text[i] + ' </p>'
+  }
+  else if(complex.includes(text[i])){
+    console.log(text[i])
+    var html = html + '<a href= https://en.wikipedia.org/wiki/' + text[i] + '>'+ text[i] + ' </a>'
+  }
+  else{
+    var html = html + '<p style="display:inline">'+ text[i] + ' </p>'
+  }
+
+}
+html += '</div>'
+console.log(html)
+var htmlObject = document.createElement('div');
+htmlObject.innerHTML = html;
+document.body.appendChild(htmlObject)
+// htmlObject.getElementById("content").style.marginTop = something;
+
+
+{% endblock %}
+</script>
