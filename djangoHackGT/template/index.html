@@ -1,15 +1,22 @@
-
 {% extends 'base.html' %}
 
-{% block title %} Upload {% endblock %}
+{% block head_title %} Welcome {% endblock %}
 
 {% block body %}
 
-<h2> Upload </h2>
-<form method='post' enctype="multipart/form-data">
-  {% csrf_token %}
-  <input type='file' name='document'>
-  <button type="submit">Upload file</button>
+<h2> Welcome to Mnemonic+ </h2>
+<p> Ever feel like you can't pay attention in Lecture?
+  Focus falling and your professor keeps going on and on?
+  Or you're watching it online and {insert favorite social media} seems so much more
+  interesting than what Professor Jalinski has to say about fundamental analysis of bromite rocks?</p>
+<h6> Never fear, for Mnemonic+ is here.</h6>
+<p> Mnemonic+ seeks to keep you engaged throughout using a variety of scientific techniques and
+  methods proven strategies to make sure you learn the material in the shortest time possible </p>
+  <ul>
+    <li><a href="simple_upload/"> Upload a Lecture</a></li>
+    <li><a href="results/"> See your uploaded lectures</li>
+  </ul>
+
 
 {% endblock %}
 

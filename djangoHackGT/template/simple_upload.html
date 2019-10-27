@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block head_title %} Upload {% endblock %}
+
+{% block body %}
+
+<h2> Upload </h2>
+<form method='post' enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type='file' name='uploaded_file'>
+  <button type="submit">Upload file</button>
+</form>
+{% endblock %}
+
+{% if uploaded_file_url %}
+    <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
+{% endif %}
+
+<p><a href="{% url 'home' %}">Return to home</a></p>
+<!-- <script type='text/javascript'>
+{% block jquery %}
+
+
+{% endblock %}
+</script> -->

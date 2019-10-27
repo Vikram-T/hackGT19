@@ -17,12 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import upload,results
+from .views import upload,results,home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', upload, name='upload'),
+    path('simple_upload/', upload, name='upload'),
     path('results/',results, name='results'),
+    path('', home, name='home' )
 ]
 
 if settings.DEBUG:

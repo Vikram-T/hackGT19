@@ -45,8 +45,8 @@ class AzureKeyWords:
         return self.r
 if __name__ == "__main__":
     url = "https://eastus.api.cognitive.microsoft.com/text/analytics/v2.1/keyPhrases"
-    MyInstance = AzureKeyWords("algo.txt")
-    r = MyInstance.splitAndSend(url);
+    MyInstance = AzureKeyWords("/Users/vikram/Documents/Programming/hackGT19/djangoHackGT/media/algo.txt")
+    r = MyInstance.splitAndSend(url, "af38334380c747b0873a35753787def2");
     #Verifies if request succeded
     print(r.status_code)
     print(r.json()['documents'][0]['keyPhrases'])
