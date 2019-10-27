@@ -25,24 +25,22 @@ def upload(request):
         return render(request, 'simple_upload.html', {'uploaded_file_url': uploaded_file_url})
     return render(request, 'simple_upload.html')
 
-
-dict = {
-    'text': ['Once', 'upon', 'a', 'time', 'in', 'a', 'land', 'far', 'far', 'away', 'there', 'was', 'a', 'guy', 'who', 'lived', 'in', 'a', 'huge', 'castle'],
-    'keywords': ['Once', 'time'],
-    'complex':['time', 'far', 'was'],
-}
+# }
 
 def gather_data(text):
     key_word = AzureKeyWords(text)
     r = key_word.splitAndSend('https://eastus.api.cognitive.microsoft.com/text/analytics/v2.1/keyPhrases',apiKey='af38334380c747b0873a35753787def2')
     print(r.status_code)
     key_notes_values = r.json()['documents'][0]['keyPhrases']
-    file = open('/Users/vikram/Documents/Programming/hackGT19/djangoHackGT/media/algo.txt','r')
+    file = open('/Users/josh/hackGT19/djangoHackGT/media/algo.txt','r')
     data = file.read().replace('\n', '')
-    summary_text = _run_article_summary(data)
+    summary_text = (_run_article_summary(data)).split(' ')
+    print(summary_text)
+    print(key_notes_values)
     file.close()
+    return {'text': data,'summary':summary_text ,'keywords': key_notes_values}
 
 
 def results(request):
-    gather_data('/Users/vikram/Documents/Programming/hackGT19/djangoHackGT/media/algo.txt')
+    dict = gather_data('/Users/josh/hackGT19/djangoHackGT/media/algo.txt')
     return render(request, 'results.html', {'data':dict})
