@@ -8,107 +8,99 @@ from google.cloud.speech import types
 import wave
 from google.cloud import storage
 import shutil
+class mp3totext:
+    def __init__(self, mp3_fileHandle):
+        self.mp3_fileHandle = mp3_fileHandle
+    #mp3 to wav
+    def mp3_to_wav(self):
+        #specify where the ffmpeg is located
+        pydub.AudioSegment.converter = shutil.which("ffmpeg")
+        sound = AudioSegment.from_mp3(self.mp3_fileHandle.name)
+        self.wav_file_name = self.mp3_fileHandle.name.split('.')[0] + '.wav'
+        #exporting audio
+        sound.export(self.wav_file_name, format="wav")
+        print("Converted {} to {}".format(self.mp3_fileHandle.name, self.wav_file_name))
 
-#mp3 to wav
-def mp3_to_wav(audio_file_name):
-    #specify where the ffmpeg is located
-    pydub.AudioSegment.converter = shutil.which("ffmpeg")
-    sound = AudioSegment.from_mp3(audio_file_name)
-    audio_file_name_wav = audio_file_name.split('.')[0] + '.wav'
-    #exporting audio
-    sound.export(audio_file_name_wav, format="wav")
-    return audio_file_name_wav
+    def frame_rate_channel(self):
+        """Required for GCP API"""
+        self.wave_file = wave.open(self.wav_file_name, "rb")
+        self.frame_rate = self.wave_file.getframerate()
+        self.channels = self.wave_file.getnchannels()
 
+    def upload_blob(self, bucket_name):
+        """Uploads source_file_name to the bucket as destination_blob_name."""
+        if '/' in self.wav_file_name:
+            self.uploadName = os.path.basename(self.wav_file_name)
+        else:
+            self.uploadName = self.wav_file_name
+        storage_client = storage.Client()
+        bucket = storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(self.uploadName)
 
-def frame_rate_channel(audio_file_name):
-    """Required for GCP API"""
-    file_name = audio_file_name
-    print(file_name)
-    wave_file = wave.open(file_name, "rb")
-    frame_rate = wave_file.getframerate()
-    channels = wave_file.getnchannels()
-    return frame_rate,channels
+        blob.upload_from_filename(self.wav_file_name)
 
+        print('File {} uploaded as {} to google cloud.'.format(
+            self.wav_file_name,
+            self.uploadName))
 
-def upload_blob(bucket_name, source_file_name, destination_blob_name):
-    """Uploads source_file_name to the bucket as destination_blob_name."""
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
+    def delete_blob(self, bucket_name):
+        """Deletes audio_file_name from the bucket."""
+        storage_client = storage.Client()
+        bucket = storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(self.uploadName)
+        blob.delete()
 
-    blob.upload_from_filename(source_file_name)
+        print('Blob {} deleted.'.format(self.uploadName))
 
-    print('File {} uploaded as {} to google cloud.'.format(
-        source_file_name,
-        destination_blob_name))
+    def sample_long_running_recognize(self):
+        """
+            Transcribe long audio file from Cloud Storage using asynchronous speech
+            recognition
 
-def delete_blob(bucket_name, blob_name):
-    """Deletes blob_name from the bucket."""
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    blob.delete()
+            Args:
+            storage_uri URI for audio file in Cloud Storage, e.g. gs://[BUCKET]/[FILE]
+        """
+        self.mp3_to_wav()
+        self.frame_rate_channel() #Gives frame rate and channels, needed for gcp
+        self.upload_blob("102619hackgtaudio")
 
-    print('Blob {} deleted.'.format(blob_name))
+        client = speech_v1.SpeechClient()
 
-def sample_long_running_recognize(audio_file_name):
- """
-    Transcribe long audio file from Cloud Storage using asynchronous speech
-    recognition
+        # Encoding of audio data sent. This sample sets this explicitly.
+        # This field is optional for FLAC and WAV audio formats.
+        encoding = enums.RecognitionConfig.AudioEncoding.LINEAR16
+        config = {
+            "sample_rate_hertz": self.frame_rate,
+            "language_code": "en-US",
+            "encoding": encoding,
+            "audio_channel_count" : self.channels,
+            "enable_automatic_punctuation" : True,
+        }
+        storage_uri = "gs://102619hackgtaudio/" + self.uploadName
+        audio = {"uri": storage_uri}
 
-    Args:
-      storage_uri URI for audio file in Cloud Storage, e.g. gs://[BUCKET]/[FILE]
-    """
-    wav_file_name = mp3_to_wav(audio_file_name) #Converst mp3 to wav
-    frame_rate,channels = frame_rate_channel(wav_file_name) #Gives frame rate and channels, needed for gcp
-    upload_blob("102619hackgtaudio", wav_file_name, wav_file_name)
+        operation = client.long_running_recognize(config, audio)
+        print(u"Waiting for operation to complete...")
+        response = operation.result()
 
-    client = speech_v1.SpeechClient()
+        file = open(self.wav_file_name + "_transcript.txt", "w", encoding='utf-8')
 
-    # Sample rate in Hertz of the audio data sent
-    sample_rate_hertz = frame_rate
+        for result in response.results:
+            # First alternative is the most probable result
+            alternative = result.alternatives[0]
+            file.write("{}".format(alternative.transcript))
+        file.close()
 
-    #channels
-    channel_count = channels
-
-    # The language of the supplied audio
-    language_code = "en-US"
-
-    # Encoding of audio data sent. This sample sets this explicitly.
-    # This field is optional for FLAC and WAV audio formats.
-    encoding = enums.RecognitionConfig.AudioEncoding.LINEAR16
-    config = {
-        "sample_rate_hertz": sample_rate_hertz,
-        "language_code": language_code,
-        "encoding": encoding,
-        "audio_channel_count" : channel_count,
-        "enable_automatic_punctuation" : True,
-    }
-    print("*************:"+wav_file_name)
-    storage_uri = "gs://102619hackgtaudio/" + wav_file_name
-    audio = {"uri": storage_uri}
-
-    operation = client.long_running_recognize(config, audio)
-    print(u"Waiting for operation to complete...")
-    response = operation.result()
-
-    file = open(wav_file_name + "_transcript.txt", "w", encoding='utf-8')
-
-    for result in response.results:
-        # First alternative is the most probable result
-        alternative = result.alternatives[0]
-        file.write("{}".format(alternative.transcript))
-    file.close()
-
-    delete_blob("102619hackgtaudio", wav_file_name)
+        self.delete_blob("102619hackgtaudio")
 
 
 # upload_blob("102619hackgtaudio","Transcript.txt","Transcript.txt")
 
 if __name__ == "__main__":
     # for audio_file_name in os.listdir(filepath):
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"HackGT-77a8a0d36669.json"
-    audio_file_name = r"gcpTestAudio.mp3"
-    sample_long_running_recognize(audio_file_name)
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"../HackGT-77a8a0d36669.json"
+    audio_file_name = open(r"../media/gcpTestAudio.mp3", 'r')
+    lecture = mp3totext(audio_file_name)
+    lecture.sample_long_running_recognize()
 
 #mp3_to_wav("Interpreting_line_plots.mp3")

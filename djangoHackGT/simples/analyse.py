@@ -5,7 +5,7 @@ import nltk
 nltk.download('stopwords')
 nltk.download('punkt')
 
-# Found following code on internet 
+# Found following code on internet
 def _create_dictionary_table(text_string) -> dict:
 
     #removing stop words
@@ -90,6 +90,6 @@ def _run_article_summary(article):
     threshold = _calculate_average_score(sentence_scores)
 
     #producing the summary
-    article_summary = _get_article_summary(sentences, sentence_scores, 1.1 * threshold)
+    article_summary = _get_article_summary(sentences, sentence_scores, 0.8 * threshold)
 
     return article_summary
