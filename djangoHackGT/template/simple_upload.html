@@ -8,21 +8,18 @@
 <form method='post' enctype="multipart/form-data">
   {% csrf_token %}
   <input type='file' name='uploaded_file'>
-  <button type="submit" >Upload file</button>
+  <button type="submit" onclick="loadInfo()">Upload file</button>
 </form>
 {% endblock %}
 
 
-<p><a href="{% url 'home' %}">Return to home</a></p>
-<!-- <button id="ajaxButton" type="button">Make a request</button>
+<!-- <p><a href="{% url 'home' %}">Return to home</a></p>
 <script type='text/javascript'>
   function loadInfo() {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      xhttp.onreadystatechange = loadInfo() {
+    xhttp.open("POST", "simple_upload/")
+    xhttp.
 
-      };
-    }
   }
 
 </script> -->

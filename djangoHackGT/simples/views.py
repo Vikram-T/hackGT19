@@ -15,15 +15,19 @@ def home(request):
 
 def upload(request):
     if request.method == 'POST' and request.FILES['uploaded_file']:
+        #Uploads and saves file
         uploaded_file = request.FILES['uploaded_file']
-        fh = open(settings.MEDIA_ROOT+"/"+uploaded_file.name, 'r')
-        mp3Object = mp3totext(fh)
         fs = FileSystemStorage()
         filename = fs.save(uploaded_file.name, uploaded_file)
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"/Users/vikram/Documents/Programming/hackGT19/djangoHackGT/HackGT-77a8a0d36669.json"
+        uploaded_file_url = fs.url(filename)
+
+        #Analyzes the audio file
+        fh = open(os.path.join(settings.MEDIA_ROOT, uploaded_file.name), 'r')
+        mp3Object = mp3totext(fh)
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(settings.SITE_ROOT,"HackGT-77a8a0d36669.json")
         mp3Object.sample_long_running_recognize()
 
-        uploaded_file_url = fs.url(filename)
+
         return render(request, 'simple_upload.html', {'uploaded_file_url': uploaded_file_url})
     return render(request, 'simple_upload.html')
 
@@ -44,6 +48,6 @@ def gather_data(text):
 
 
 def results(request):
-    dict = gather_data(r'/Users/vikram/Documents/Programming/hackGT19/djangoHackGT/media/gcpTestAudio.wav_transcript.txt')
+    dict = gather_data(os.path.join(settings.SITE_ROOT,"/media/gcpTestAudio.wav_transcript.txt"))
     return render(request, 'results.html', {'data':dict})
 
