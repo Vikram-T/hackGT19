@@ -36,6 +36,7 @@ class mp3totext:
         storage_client = storage.Client()
         bucket = storage_client.get_bucket(bucket_name)
         blob = bucket.blob(self.uploadName)
+        print(blob)
 
         blob.upload_from_filename(self.wav_file_name)
 

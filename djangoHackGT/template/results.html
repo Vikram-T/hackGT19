@@ -84,10 +84,10 @@ for (var i = 0; i < summary.length; i++) {
     console.log(text[i])
     html = html + '<p style="color:orange;display:inline">'+ summary[i] + ' </p>'
   }
-  // else if(complex.includes(text[i])){
-  //   console.log(text[i])
-  //   var html = html + '<a href= https://en.wikipedia.org/wiki/' + text[i] + '>'+ text[i] + ' </a>'
-  // }
+  else if(summary[i].length > 6){
+    console.log(text[i])
+    var html = html + '<a href= https://en.wikipedia.org/wiki/' + summary[i] + '>'+ summary[i] + ' </a>'
+  }
   else{
     var html = html + '<p style="display:inline">'+ summary[i] + ' </p>'
   }

@@ -44,10 +44,13 @@ def gather_data(text):
     print(summary_text)
     print(key_notes_values)
     file.close()
+    # wiki_words = NLP_GCP(text)
+    # words, wiki = wiki_words.nat_lang_analysis(text)
+    # print(words)
+    # print(wiki)
     return {'text': data,'summary':summary_text ,'keywords': key_notes_values}
 
 
 def results(request):
     dict = gather_data(os.path.join(settings.SITE_ROOT,"/media/gcpTestAudio.wav_transcript.txt"))
     return render(request, 'results.html', {'data':dict})
-
